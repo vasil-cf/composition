@@ -1,0 +1,24 @@
+version: "1.0"
+services:
+  name: my_database
+  composition:
+    my-redis-db-host:
+      image: gcr.io/codefresh-dev-170600/redis:latest
+      ports:
+        - 6379
+steps:
+  my_first_step:
+    image: gcr.io/codefresh-dev-170600/alpine:latest
+    title: Storing Redis data
+    commands:
+      - apk --update add redis
+      - redis-cli -u redis://my-redis-db-host:6379 -n 0 LPUSH mylist "hello world"  
+      - echo finished
+      - COUNTER=1;
+        while [  $COUNTER -lt 60000 ]; do
+          echo The counter is $COUNTER;
+          let COUNTER=COUNTER+1;
+        done
+      - sleep 10
+    services:
+      - my_database
